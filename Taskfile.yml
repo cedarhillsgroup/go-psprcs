@@ -1,0 +1,56 @@
+version: '3'
+
+vars:
+  PRCSNAME: 'OPRAUDIT'
+  BIN_DIR: 'bin'
+  SANDBOX_HOST: 'cs9239pt862v1'
+  SANDBOX_TOOLBIN: 'C:\psft\pt\ps_home8.62.06\bin\client\winx86'
+
+tasks:
+  default:
+    desc: 'Run tests and build Windows executable'
+    cmds:
+      - task: test
+      - task: build:windows
+
+  test:
+    desc: 'Run all unit tests'
+    cmds:
+      - go test -v ./...
+
+  build:
+    desc: 'Build local executable (max 12 uppercase characters)'
+    cmds:
+      - mkdir -p {{.BIN_DIR}}
+      - go build -ldflags="-s -w" -o {{.BIN_DIR}}/{{.PRCSNAME}} ./cmd/{{.PRCSNAME}}
+    sources:
+      - '**/*.go'
+    generates:
+      - '{{.BIN_DIR}}/{{.PRCSNAME}}'
+
+  build:windows:
+    desc: 'Cross-compile Windows binary PSOPRAUDIT.exe (GOOS=windows GOARCH=amd64)'
+    cmds:
+      - mkdir -p {{.BIN_DIR}}
+      - GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o {{.BIN_DIR}}/{{.PRCSNAME}}.exe ./cmd/{{.PRCSNAME}}
+    sources:
+      - '**/*.go'
+    generates:
+      - '{{.BIN_DIR}}/{{.PRCSNAME}}.exe'
+
+  run:demo:
+    desc: 'Run PSOPRAUDIT locally in demo mode'
+    cmds:
+      - go run ./cmd/{{.PRCSNAME}} -i 50100 -r DEMO_AUDIT -co PS -cd CS92DEV -ct ORACLE -fp ./reports -of TXT -ot 2
+
+  deploy:sandbox:
+    desc: 'Deploy compiled binary to PeopleTools bin directory on cs9239pt862v1'
+    deps: [build:windows]
+    cmds:
+      - scp {{.BIN_DIR}}/{{.PRCSNAME}}.exe {{.SANDBOX_HOST}}:'{{.SANDBOX_TOOLBIN}}\{{.PRCSNAME}}.exe'
+      - ssh {{.SANDBOX_HOST}} 'Get-Item "{{.SANDBOX_TOOLBIN}}\{{.PRCSNAME}}.exe" | Select-Object Name, Length, LastWriteTime'
+
+  clean:
+    desc: 'Clean built binaries and reports'
+    cmds:
+      - rm -rf {{.BIN_DIR}} reports

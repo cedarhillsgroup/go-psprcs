@@ -1,0 +1,19 @@
+# Binaries
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Taskfile cache
+.task/
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Test reports
+reports/
+tmp/
+tmp_report/
