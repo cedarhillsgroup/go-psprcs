@@ -117,7 +117,7 @@ func main() {
 
 When registering a custom executable in PeopleSoft (**PeopleTools > Process Scheduler > Process Types**), the underlying record is `PS_PRCSTYPEDEFN`.
 
-The field [`GENPRCSTYPE`](https://demo.pslens.com/fields/GENPRCSTYPE?rec_tables=true&rec_views=true&rec_derived=true&rec_subrecords=true&rec_dynamic=true&rec_query=true&rec_temp=true&md_include_related=true&md_deep_links=true&db=cs9239pt862v1&auto_scroll=true) categorizes the engine:
+The field `GENPRCSTYPE` categorizes the engine:
 
 | Value |                      Meaning                      |
 | ----- | ------------------------------------------------- |
